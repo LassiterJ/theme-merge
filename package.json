@@ -1,0 +1,22 @@
+{
+  "name": "theme-merge",
+  "type": "module",
+  "devDependencies": {
+    "typescript": "^4.9.5"
+  },
+  "version": "1.0.0",
+  "description": "A project created to merge two theme objects together and output the new Theme to a new file. Still a rough draft. ",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "theme",
+    "merge"
+  ],
+  "author": "Jonathan Lassiter",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^18.13.0"
+  }
+}
