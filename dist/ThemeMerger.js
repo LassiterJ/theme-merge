@@ -1,31 +1,4 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const fs = __importStar(require("fs"));
-// Built as a solution to updating a JSON theme file with a new theme with only the values that have changed, even in descendent children
-// The class handles the merge as well as formatting and optionally outputting to a file in a specified directory.
+import * as fs from 'fs';
 class ThemeMerger {
     options;
     constructor(initialOptions) {
@@ -40,16 +13,12 @@ class ThemeMerger {
             throw new Error("Input Options are not Valid.");
         }
         // format target and source as necessary
-        const targetIsJSON = this.isValidJSON(options.target);
-        const sourceIsJSON = this.isValidJSON(options.source);
+        const target = this.isObject(options.target) ? options.target : this.jsonToThemeObj(options.target);
+        const source = this.isObject(options.source) ? options.source : this.jsonToThemeObj(options.source);
         this.options = {
             ...options,
-            target: targetIsJSON
-                ? this.jsonToThemeObj(options.target)
-                : options.target,
-            source: sourceIsJSON
-                ? this.jsonToThemeObj(options.source)
-                : options.source
+            target,
+            source
         };
     }
     createNewTheme() {
@@ -94,17 +63,6 @@ class ThemeMerger {
         // createFile,
         return !(!options?.target || !options?.source);
     }
-    isValidJSON(jsonString) {
-        if (typeof jsonString !== "string")
-            return false; // don't even try to parse;
-        try {
-            JSON.parse(jsonString);
-            return true;
-        }
-        catch (error) {
-            return false;
-        }
-    }
     writeJSONStringToFile(jsonString, path = "./", fileName) {
         const filePath = `${path}/${fileName}.json`;
         fs.writeFile(filePath, jsonString, (err) => {
@@ -118,33 +76,20 @@ class ThemeMerger {
         if (!theme) {
             throw new Error("The input theme is falsy");
         }
-        if (this.isObject(theme))
-            return theme;
-        // if (!this.isValidJSON(theme)) {
-        //     throw new Error("The given JSON string is not valid.");
-        // }
-        const result = {};
+        //const result = {};
         try {
-            return JSON.parse(theme); // I swear I tried this before and it didn't work. Lets see
-            // for (const key of Object.keys(parsedJSON)) {
-            //     if (this.isObject(parsedJSON)[key] && !(parsedJSON[key] instanceof Array)) {
-            //         result[key] = {...this.jsonToThemeObj(parsedJSON[key])};
-            //     } else {
-            //         result[key] = parsedJSON[key];
-            //     }
-            // }
-            //return result;
+            return JSON.parse(theme); // I swear I tried this before, and it didn't work deeply. Let's see...
         }
         catch (error) {
-            throw new Error(`Failed to parse the JSON string: ${error.message}`);
+            throw new Error(`Failed to parse the JSON string: ${error.message}`, error);
         }
     }
     outputNewTheme(themeObject) {
-        const { createFile, outputFormat, outputDirectory, outputFileName } = this.options;
+        const { createFile, outputFormat, outputPath, outputFileName = "" } = this.options;
         const jsonTheme = JSON.stringify(themeObject, null, 4);
         const formattedTheme = outputFormat === "jsonString" ? jsonTheme : themeObject;
         if (createFile) {
-            this.writeJSONStringToFile(jsonTheme, outputDirectory, outputFileName);
+            this.writeJSONStringToFile(jsonTheme, outputPath, outputFileName);
         }
         return formattedTheme;
     }

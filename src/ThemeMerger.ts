@@ -9,48 +9,47 @@ type ThemeObject = {
 
 type OutputFormat = "jsonString" | "jsObject"; // TODO: add support for more outputFormats AND/OR let a formatter be passed in as a ThemeMergeOption
 type CreateFile = boolean;
-interface ThemeMergeOptionsInterface {
+interface InitialOptions {
     createFile?: CreateFile;
-    outputDirectory?: ThemeMergeOptionsInterface["createFile"] extends true
+    outputPath?: InitialOptions["createFile"] extends true
         ? string
         : never;
-    outputFileName?: ThemeMergeOptionsInterface["createFile"] extends true
+    outputFileName?: InitialOptions["createFile"] extends true
         ? string
         : never;
     outputFormat?: OutputFormat;
-    source: ThemeObject | ThemeObject[];
+    source: ThemeObject | ThemeObject[] | string
     target: ThemeObject | string;
 }
+interface Options extends InitialOptions {
+    source: ThemeObject | ThemeObject[];
+    target: ThemeObject;
+}
 
-// Built as a solution to updating a JSON theme file with a new theme with only the values that have changed, even in descendent children
-// The class handles the merge as well as formatting and optionally outputting to a file in a specified directory.
 class ThemeMerger {
-    public readonly options: ThemeMergeOptionsInterface;
-    constructor(initialOptions: ThemeMergeOptionsInterface) {
-        const defaultOptions: ThemeMergeOptionsInterface = {
+    public readonly options: Options;
+    constructor(initialOptions: InitialOptions) {
+        const defaultOptions: InitialOptions = {
             target: {},
             source: [{}],
             createFile: false,
             outputFormat: "jsonString"
         };
 
-        const options = { ...defaultOptions, ...initialOptions };
+        const options: InitialOptions = { ...defaultOptions, ...initialOptions };
         if (!this.optionsAreValid(options)) {
             throw new Error("Input Options are not Valid.");
         }
         // format target and source as necessary
-        const targetIsJSON = this.isValidJSON(options.target);
-        const sourceIsJSON = this.isValidJSON(options.source);
+        const target: ThemeObject= this.isObject(options.target) ? options.target as ThemeObject: this.jsonToThemeObj(options.target as string);
+        const source: ThemeObject = this.isObject(options.source) ? options.source as ThemeObject: this.jsonToThemeObj(options.source as string);
 
         this.options = {
             ...options,
-            target: targetIsJSON
-                ? this.jsonToThemeObj(options.target)
-                : options.target,
-            source: sourceIsJSON
-                ? this.jsonToThemeObj(options.source)
-                : options.source
+            target,
+            source
         };
+
     }
 
     public createNewTheme() {
@@ -85,10 +84,10 @@ class ThemeMerger {
         return this.mergeThemes(target, ...sources);
     }
     // private methods TODO: we may want some of these to be publicly available or moved to Utils file/folder
-    private isObject(item: any) {
+    private isObject(item: any): true | false{
         return item && typeof item === "object" && !Array.isArray(item);
     }
-    private optionsAreValid(options: ThemeMergeOptionsInterface) {
+    private optionsAreValid(options: InitialOptions): true | false {
         //  TODO: add other conditions for options and refine current ones:
         // fileType
         // outputFormat
@@ -97,15 +96,7 @@ class ThemeMerger {
         return !(!options?.target || !options?.source);
 
     }
-    private isValidJSON(jsonString: string | any): boolean {
-        if (typeof jsonString !== "string") return false; // don't even try to parse;
-        try {
-            JSON.parse(jsonString);
-            return true;
-        } catch (error) {
-            return false;
-        }
-    }
+
     private writeJSONStringToFile(
         jsonString: string | any,
         path = "./",
@@ -118,42 +109,32 @@ class ThemeMerger {
             console.log(`JSON string written to file: ${filePath}`);
         });
     }
-    private jsonToThemeObj(theme: string) {
+    private jsonToThemeObj(theme: string): ThemeObject {
         if(!theme){
             throw new Error("The input theme is falsy");
         }
-        if (this.isObject(theme)) return theme;
-        // if (!this.isValidJSON(theme)) {
-        //     throw new Error("The given JSON string is not valid.");
-        // }
-        const result = {};
-    try {
-        return JSON.parse(theme) // I swear I tried this before and it didn't work. Lets see
 
-        // for (const key of Object.keys(parsedJSON)) {
-        //     if (this.isObject(parsedJSON)[key] && !(parsedJSON[key] instanceof Array)) {
-        //         result[key] = {...this.jsonToThemeObj(parsedJSON[key])};
-        //     } else {
-        //         result[key] = parsedJSON[key];
-        //     }
-        // }
-        //return result;
-        }catch(error){
-            throw new Error(`Failed to parse the JSON string: ${error.message}`);
+        //const result = {};
+
+    try {
+        return JSON.parse(theme) // I swear I tried this before, and it didn't work deeply. Let's see...
+
+        }catch(error: any){
+            throw new Error(`Failed to parse the JSON string: ${error.message}`, error);
         }
     }
     private outputNewTheme(themeObject: object): object | string {
         const {
             createFile,
             outputFormat,
-            outputDirectory,
-            outputFileName
+            outputPath,
+            outputFileName = ""
         } = this.options;
         const jsonTheme = JSON.stringify(themeObject, null, 4);
         const formattedTheme =
             outputFormat === "jsonString" ? jsonTheme : themeObject;
         if (createFile) {
-            this.writeJSONStringToFile(jsonTheme, outputDirectory, outputFileName);
+            this.writeJSONStringToFile(jsonTheme, outputPath, outputFileName);
         }
         return formattedTheme;
     }
