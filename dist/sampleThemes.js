@@ -1,8 +1,13 @@
-export const DesignSystemTheme = {
+export const NewTheme = {
     "divider": {
         "value": "rgba(255,255,255,0.12)",
         "type": "color",
-        "description": "Reflects the divider variable from the theme object"
+        "description": "Reflects the divider variable from the theme object",
+        "testField": "TEST PASSED",
+        "testField2": {
+            "nested": "TEST PASSED"
+        },
+        "newTestField": "TEST PASSED"
     },
     "text": {
         "primary": {
@@ -1733,11 +1738,15 @@ export const DesignSystemTheme = {
         }
     }
 };
-export const WebsiteTheme = {
+export const OldTheme = {
     "divider": {
         "value": "rgba(255,255,255,0.12)",
         "type": "color",
-        "description": "Reflects the divider variable from the theme object"
+        "description": "Reflects the divider variable from the theme object",
+        "testField": "TEST FAILED",
+        "testField2": {
+            "nested": "TEST FAILED"
+        }
     },
     "text": {
         "primary": {

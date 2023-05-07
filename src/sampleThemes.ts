@@ -1,9 +1,14 @@
 import {ThemeObject} from "./ThemeMerger";
-export const DesignSystemTheme: ThemeObject = {
+export const NewTheme: ThemeObject = {
     "divider": {
         "value": "rgba(255,255,255,0.12)",
         "type": "color",
-        "description": "Reflects the divider variable from the theme object"
+        "description": "Reflects the divider variable from the theme object",
+        "testField": "TEST PASSED",
+        "testField2": {
+            "nested": "TEST PASSED"
+        },
+        "newTestField": "TEST PASSED"
     },
     "text": {
         "primary": {
@@ -1734,11 +1739,15 @@ export const DesignSystemTheme: ThemeObject = {
         }
     }
 };
-export const WebsiteTheme: ThemeObject = {
+export const OldTheme: ThemeObject = {
     "divider": {
         "value": "rgba(255,255,255,0.12)",
         "type": "color",
-        "description": "Reflects the divider variable from the theme object"
+        "description": "Reflects the divider variable from the theme object",
+        "testField": "TEST FAILED",
+        "testField2": {
+            "nested": "TEST FAILED"
+        }
     },
     "text": {
         "primary": {

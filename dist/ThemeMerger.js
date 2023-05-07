@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { DesignSystemTheme, WebsiteTheme } from './sampleThemes.js';
+import { NewTheme, OldTheme } from './sampleThemes.js';
 class ThemeMerger {
     options;
     constructor(initialOptions) {
@@ -35,6 +35,7 @@ class ThemeMerger {
         const source = sources.shift();
         if (!this.isObject(source))
             return this.mergeThemes(target, ...sources);
+        // apply overwrites to target ThemeObject
         for (const key in source) {
             if (this.isObject(source[key])) {
                 target[key] = this.mergeThemes(target[key] || {}, source[key]);
@@ -45,7 +46,7 @@ class ThemeMerger {
         }
         return this.mergeThemes(target, ...sources);
     }
-    // private methods TODO: we may want some of these to be publicly available or moved to Utils file/folder
+    // private Methods TODO: we may want some of these to be publicly available or moved to Utils file/folder
     isObject(item) {
         return item && typeof item === "object" && !Array.isArray(item);
     }
@@ -70,9 +71,8 @@ class ThemeMerger {
         if (!theme) {
             throw new Error("The input theme is falsy");
         }
-        //const result = {};
         try {
-            return JSON.parse(theme); // I swear I tried this before, and it didn't work deeply. Let's see...
+            return JSON.parse(theme);
         }
         catch (error) {
             throw new Error(`Failed to parse the JSON string: ${error.message}`, error);
@@ -87,7 +87,7 @@ class ThemeMerger {
         // format target and source as necessary
         const formattedTarget = this.isObject(options.target) ? options.target : this.jsonToThemeObj(options.target);
         const formattedSource = this.isObject(options.source) ? options.source : this.jsonToThemeObj(options.source);
-        if (createFile) { // TODO: Not sure I like assigning to the restOptions object rather than making a new object.
+        if (createFile) { // TODO: I don't like assigning to the restOptions object rather than making a new object.
             Object.assign(restOptions, { createFile, outputPath, outputFileName });
         }
         return { target: formattedTarget, source: formattedSource, ...restOptions };
@@ -104,11 +104,12 @@ class ThemeMerger {
     }
 }
 const themeMergeInstance = new ThemeMerger({
-    target: WebsiteTheme,
-    source: DesignSystemTheme,
+    target: OldTheme,
+    source: NewTheme,
     createFile: true,
     // outputPath: "../jsonThemes",
-    outputFileName: "newTheme",
+    outputFileName: "mergedTheme",
 });
+// Allows for only updating the theme with the values that have changed. Like what a Virtual DOM does.
 const newTheme = themeMergeInstance.createNewTheme();
 console.log("newTheme: ", newTheme);
