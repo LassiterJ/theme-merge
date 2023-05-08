@@ -5,7 +5,8 @@ export const NewTheme = {
         "description": "Reflects the divider variable from the theme object",
         "testField": "TEST PASSED",
         "testField2": {
-            "nested": "TEST PASSED"
+            "nested": "TEST PASSED",
+            "newNested": "TEST PASSED"
         },
         "newTestField": "TEST PASSED"
     },
