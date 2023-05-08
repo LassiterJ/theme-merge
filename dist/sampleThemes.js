@@ -10,6 +10,14 @@ export const NewTheme = {
         },
         "newTestField": "TEST PASSED"
     },
+    "extendedColors": [
+        {
+            "harmonized": false,
+            "color": "#FF0000",
+            "name": "demo",
+            "description": "TEST for handling of Arrays of Objects",
+        }
+    ],
     "text": {
         "primary": {
             "value": "rgba(255,255,255, 1)",

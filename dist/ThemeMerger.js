@@ -1,10 +1,14 @@
 import * as fs from 'fs';
 import { NewTheme as theme2, OldTheme as theme1 } from './sampleThemes.js';
+import path from "path";
 class ThemeMerger {
     options;
     static readJSONFile(filePath) {
         try {
-            const file = fs.readFileSync(filePath, "utf8");
+            const __dirname = path.resolve();
+            console.log("readJSONFile directory", __dirname);
+            const fPath = `${__dirname}/${filePath}`;
+            const file = fs.readFileSync(fPath, "utf8");
             return JSON.parse(file);
         }
         catch (error) {
@@ -50,6 +54,8 @@ class ThemeMerger {
         if (Array.isArray(source)) {
             if (source.length < 1)
                 return this.mergeThemes(target, ...sources);
+            console.log("source is an Array");
+            console.log("source: ", source);
             return source.map((item, index) => {
                 if (this.isObject(item)) {
                     return this.mergeThemes(target[index] || {}, item);
@@ -81,7 +87,7 @@ class ThemeMerger {
     }
     async writeJSONStringToFile(jsonString, path = ".", fileName) {
         const filePath = `${path}/${fileName}.json`;
-        console.log("filePath: ", filePath);
+        console.log("writeJSONStringToFile filePath: ", filePath);
         fs.writeFile(filePath, jsonString, (err) => {
             if (err)
                 throw err;
@@ -117,10 +123,11 @@ class ThemeMerger {
     ;
     outputNewTheme(themeObject) {
         try {
-            const { createFile, outputFormat, outputPath, outputFileName = "" } = this.options;
+            const { createFile, outputFormat, outputPath, outputFileName = "newTheme", } = this.options;
             const jsonTheme = JSON.stringify(themeObject, null, 4);
             const formattedTheme = outputFormat === "jsonString" ? jsonTheme : themeObject;
             if (createFile) {
+                console.log("outputNewTheme createFile");
                 this.writeJSONStringToFile(jsonTheme, outputPath, outputFileName);
             }
             return formattedTheme;
@@ -135,15 +142,17 @@ class ThemeMerger {
 //
 //
 /* ========== Usage Demo ========== */
-const useDemoData = false;
-const OldTheme = useDemoData ? theme1 : ThemeMerger.readJSONFile("../themes/theme1.json");
-const NewTheme = useDemoData ? theme2 : ThemeMerger.readJSONFile("../themes/theme2.json");
+const __dirnamePage = path.resolve();
+console.log("working directory Page", __dirnamePage);
+const useDemoData = true;
+const NewTheme = useDemoData ? theme2 : ThemeMerger.readJSONFile("/themes/theme2.json");
+const OldTheme = useDemoData ? theme1 : ThemeMerger.readJSONFile("/themes/theme1.json");
 // Instantiate the ThemeMerger class with the options
 const themeMergeInstance = new ThemeMerger({
     target: OldTheme,
     source: NewTheme,
     createFile: true,
-    outputPath: "../themes",
+    outputPath: "themes",
     outputFileName: "mergedTheme",
 });
 // Call the createNewTheme method to merge the themes and optionally output to a file

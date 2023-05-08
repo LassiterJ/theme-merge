@@ -1,0 +1,9 @@
+// Info on how to use ThemeMerger demo
+        // run "npm install" to install dependencies
+        // run npm start to start the demo
+
+        // Advanced usage
+        // Navigate to ThemeMerger.js and toggle the "useDemoData" switch to true or false
+            // True: Uses the sample themes defined in sampleThemes.js
+            // False: Uses the "theme1" and "theme2" json files located in the "themes" directory
+            // Re-run npm start to see the changes
