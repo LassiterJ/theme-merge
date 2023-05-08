@@ -1,6 +1,7 @@
 import * as fs from 'fs';
  import {NewTheme as theme2, OldTheme as theme1} from './sampleThemes.js';
 import path from "path";
+import {open} from "fs/promises";
 
 // Description: Deep merge two objects or arrays with configuration options
 // Built as a solution to updating a JSON theme file with a new theme with only the values that have changed, even in descendent children
@@ -67,7 +68,9 @@ class ThemeMerger {
         // Recursively traverse the sources Array and merge each source into the target
         // Only merge items that have changed or is not present in target
         // if no sources, return target
+        console.log("sources.length ",sources.length)
         if (!sources.length || !this.isObject(target)) {
+            console.log("sources: ", sources);
             return target;
         }
 
@@ -76,7 +79,7 @@ class ThemeMerger {
         // if source is an Array, map over it and merge each item into the target
         if(Array.isArray(source)){
             if(source.length < 1)return this.mergeThemes(target, ...sources);
-            console.log("source is an Array");
+            console.count("source is an Array");
             console.log("source: ", source);
             return source.map((item, index) => {
                 if (this.isObject(item)) {
@@ -118,11 +121,9 @@ class ThemeMerger {
     ) {
         const filePath = `${path}/${fileName}.json`;
         console.log("writeJSONStringToFile filePath: ", filePath);
-        fs.writeFile(filePath, jsonString, (err) => {
-            if (err) throw err;
-            // console.log(`JSON string written to file: ${filePath}`);
-            console.log("writeFile Callback");
-        });
+        const filehandle = await open(`${path}/${fileName}.json`, 'w');
+        filehandle?.writeFile(jsonString);
+        filehandle?.close();
     }
     private jsonToThemeObj(theme: string): ThemeObject {
         if (!theme) {
@@ -153,7 +154,7 @@ class ThemeMerger {
         return {target: formattedTarget, source: formattedSource, ...restOptions};
     };
 
-    private outputNewTheme(themeObject: object): object | string {
+    private async outputNewTheme(themeObject: object): Promise<object | string> {
         try {
             const {
                 createFile,
@@ -165,7 +166,12 @@ class ThemeMerger {
             const formattedTheme = outputFormat === "jsonString" ? jsonTheme : themeObject;
             if (createFile) {
                 console.log("outputNewTheme createFile");
-                this.writeJSONStringToFile(jsonTheme, outputPath, outputFileName);
+                // delete existing file if it exists TODO: add option to overwrite or append
+                if (fs.existsSync(`${outputPath}/${outputFileName}.json`)) {
+                    const filehandle = await open(`${outputPath}/${outputFileName}.json`, 'w');
+                    const writeFileResponse = await filehandle?.writeFile(jsonTheme);
+                }
+                await this.writeJSONStringToFile(jsonTheme, outputPath, outputFileName);
             }
             return formattedTheme;
         } catch (error) {
@@ -180,7 +186,7 @@ class ThemeMerger {
 /* ========== Usage Demo ========== */
 const __dirnamePage = path.resolve();
 console.log("working directory Page",__dirnamePage);
-const useDemoData = true;
+const useDemoData = false;
 const NewTheme = useDemoData ? theme2: ThemeMerger.readJSONFile("/themes/theme2.json");
 const OldTheme = useDemoData ? theme1: ThemeMerger.readJSONFile("/themes/theme1.json");
 

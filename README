@@ -2,18 +2,18 @@
 
 ## Usage
 
-1. Run `npm install` to install dependencies.
-2. Run `npm start` to start the demo.
+1. Run npm install to install dependencies.
+2. Run npm start to start the demo.
 
 ## Advanced Usage
 
-1. Navigate to `ThemeMerger.js` and toggle the `useDemoData` switch to `true` or `false`.
-    - `true`: Uses the sample themes defined in `sampleThemes.js`.
-    - `false`: Uses the `theme1` and `theme2` JSON files located in the `themes` directory.
-2. Re-run `npm start` to see the changes.
+1. Navigate to ThemeMerger.js and toggle the useDemoData switch to true or false.
+    - true: Uses the sample themes defined in sampleThemes.js.
+    - false: Uses the theme1 and theme2 JSON files located in the themes directory.
+2. Re-run npm start to see the changes.
 
 # Figma Script Test
 
-1. Copy the contents of `FigmaDuplicateTypography.js`.
+1. Copy the contents of FigmaDuplicateTypography.js.
 2. Paste into Figma's command line and target a frame with a descendant container node labeled "HeadingContainer".
 3. Press Enter to run the code and see clones added with new font styles applied.
