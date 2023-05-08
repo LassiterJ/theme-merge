@@ -7,3 +7,7 @@
             // True: Uses the sample themes defined in sampleThemes.js
             // False: Uses the "theme1" and "theme2" json files located in the "themes" directory
             // Re-run npm start to see the changes
+// Figma Script Test
+    // Copy contents of FigmaDuplicateTypography.js
+    // Paste into Figma's command line and target a frame with a descendant container node labeled "HeadingContainer".
+    // click enter to run code and see clones added with new font styles applied
